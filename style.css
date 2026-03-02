@@ -400,6 +400,25 @@ section:nth-child(even) {
   font-weight: 600;
 }
 
+/* ── Guide cards ───────────────────────────────────────────────────── */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.card-link:hover {
+  opacity: 1;
+}
+
+.guide-cmd {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
 /* ── Code blocks ───────────────────────────────────────────────────── */
 .code-block {
   position: relative;

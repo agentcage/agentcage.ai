@@ -122,8 +122,8 @@
 <!-- ── Defense Layers ───────────────────────────────────────────────── -->
 <section id="features">
   <div class="container">
-    <p class="section-label text-center">Defense Layers</p>
-    <h2 class="text-center">Multiple Overlapping Defenses</h2>
+    <p class="section-label text-center">Defense-In-Depth</p>
+    <h2 class="text-center">Multiple Defense Layers</h2>
     <p class="section-desc">Every HTTP request passes through multiple independent inspection layers. A failure in any one layer doesn't compromise the others.</p>
 
     <div class="card-grid">
@@ -179,27 +179,6 @@
     <p class="section-label text-center">How It Works</p>
     <h2 class="text-center">Three-Container Topology</h2>
     <p class="section-desc">Agent, DNS sidecar, and inspecting proxy on an internal network with no internet gateway.</p>
-
-    <div class="ascii-diagram">  podman network: &lt;name&gt;-net (--internal, no internet gateway)
-  ┌──────────────────────────────────────────────────────────────────┐
-  │                                                                  │
-  │  ┌──────────────┐    ┌───────────────┐    ┌──────────────────┐  │
-  │  │ Agent         │    │ DNS sidecar   │    │ mitmproxy        │  │
-  │  │ 10.89.0.2    │    │ (dnsmasq)     │    │ + inspector chain│  │
-  │  │               │    │               │    │                  │  │
-  │  │ HTTP_PROXY=  ─┼────┼───────────────┼───►│ forward :8080   ─┼──┼─► Internet
-  │  │  10.89.0.11   │    │               │    │                  │  │
-  │  │               │    │               │    │ transparent:8443│  │
-  │  │ default route─┼────┼───────────────┼───►│  ↕ iptables REDIR│  │
-  │  │               │    │               │    │ reverse :port   ◄┼──┼── Host
-  │  │ resolv.conf  ─┼───►│ resolves via  │    │   ↕ inspects     │  │
-  │  │               │    │ external net ─┼────┼──────────────────┼──┼─► Upstream DNS
-  │  │               │    │               │    │                  │  │
-  │  │ ONLY on       │    │ internal +    │    │ internal +       │  │
-  │  │ internal net  │    │ external net  │    │ external net     │  │
-  │  └──────────────┘    └───────────────┘    └──────────────────┘  │
-  │                                                                  │
-  └──────────────────────────────────────────────────────────────────┘</div>
 
     <div class="steps">
       <div class="step">
@@ -266,60 +245,102 @@
   </div>
 </section>
 
-<!-- ── Threat Coverage ──────────────────────────────────────────────── -->
-<section id="threats">
+<!-- ── OWASP Coverage ────────────────────────────────────────────────── -->
+<section id="owasp">
   <div class="container">
-    <p class="section-label text-center">Threat Coverage</p>
-    <h2 class="text-center">What's Defended</h2>
-    <p class="section-desc">Coverage varies by isolation mode. See the <a href="https://github.com/agentcage/agentcage/blob/master/docs/security.md">full threat model</a> for details and known limitations.</p>
+    <p class="section-label text-center">Security Coverage</p>
+    <h2 class="text-center">OWASP Top 10 for Agentic Applications</h2>
+    <p class="section-desc">How agentcage maps to the <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">2026 OWASP agentic risk categories</a>. See the <a href="https://github.com/agentcage/agentcage/blob/master/docs/security.md">full threat model</a> for details.</p>
 
     <div class="threat-table-wrapper">
       <table class="threat-table">
         <thead>
           <tr>
-            <th>Threat</th>
-            <th>Container Mode</th>
-            <th>Firecracker Mode</th>
+            <th>OWASP Risk</th>
+            <th>Coverage</th>
+            <th>How</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>HTTP/HTTPS exfiltration</td>
-            <td><span class="status-badge status-defended">Defended</span></td>
-            <td><span class="status-badge status-defended">Defended</span></td>
-          </tr>
-          <tr>
-            <td>Secret leakage</td>
-            <td><span class="status-badge status-defended">Defended</span></td>
-            <td><span class="status-badge status-defended">Defended</span></td>
-          </tr>
-          <tr>
-            <td>Unauthorized API calls</td>
-            <td><span class="status-badge status-defended">Defended</span></td>
-            <td><span class="status-badge status-defended">Defended</span></td>
-          </tr>
-          <tr>
-            <td>DNS exfiltration</td>
-            <td><span class="status-badge status-partial">Partial</span></td>
-            <td><span class="status-badge status-partial">Partial</span></td>
-          </tr>
-          <tr>
-            <td>Container / runtime escape</td>
+            <td>ASI01 Agent Goal Hijack</td>
             <td><span class="status-badge status-out">Out of scope</span></td>
-            <td><span class="status-badge status-defended">Defended</span></td>
+            <td>agentcage inspects network traffic, not agent intent</td>
           </tr>
           <tr>
-            <td>Kernel exploit</td>
-            <td><span class="status-badge status-out">Out of scope</span></td>
-            <td><span class="status-badge status-defended">Defended</span></td>
+            <td>ASI02 Tool Misuse</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Domain allowlist, WebSocket inspection, DNS filtering limit reachable services</td>
           </tr>
           <tr>
-            <td>Side-channel attacks</td>
-            <td><span class="status-badge status-out">Out of scope</span></td>
-            <td><span class="status-badge status-out">Out of scope</span></td>
+            <td>ASI03 Identity / Privilege Abuse</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Secret injection prevents agent from holding real credentials</td>
+          </tr>
+          <tr>
+            <td>ASI04 Supply Chain</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Pinned image digests, pinned deps, inspector path validation</td>
+          </tr>
+          <tr>
+            <td>ASI05 Code Execution</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Read-only rootfs, dropped capabilities, no-new-privileges</td>
+          </tr>
+          <tr>
+            <td>ASI06 Memory Poisoning</td>
+            <td><span class="status-badge status-out">N/A</span></td>
+            <td>agentcage doesn't manage agent memory</td>
+          </tr>
+          <tr>
+            <td>ASI07 Inter-Agent Comms</td>
+            <td><span class="status-badge status-out">N/A</span></td>
+            <td>Single-agent scope</td>
+          </tr>
+          <tr>
+            <td>ASI08 Cascading Failures</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Fail-closed on proxy down, systemd auto-restart, per-host rate limiting</td>
+          </tr>
+          <tr>
+            <td>ASI09 Human Trust</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Persistent structured audit logging with all decisions logged by default</td>
+          </tr>
+          <tr>
+            <td>ASI10 Rogue Agents</td>
+            <td><span class="status-badge status-defended">Strong</span></td>
+            <td>Network isolation, multi-layer inspection, DNS filtering, WebSocket inspection</td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Setup Guides ─────────────────────────────────────────────────── -->
+<section id="guides">
+  <div class="container">
+    <p class="section-label text-center">Setup Guides</p>
+    <h2 class="text-center">Works With Your Agent</h2>
+    <p class="section-desc">Pre-built scaffolds with sensible defaults for popular AI agents. Run <code>agentcage init --list-scaffolds</code> to see all available options.</p>
+
+    <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <a href="https://github.com/agentcage/agentcage/blob/master/src/agentcage/scaffolds/openclaw/README.md" class="card card-link">
+        <h3>OpenClaw</h3>
+        <p>Full-featured AI coding agent with browser UI, device pairing, and web search integration.</p>
+        <span class="guide-cmd">--scaffold openclaw</span>
+      </a>
+      <a href="https://github.com/agentcage/agentcage/blob/master/src/agentcage/scaffolds/picoclaw/README.md" class="card card-link">
+        <h3>PicoClaw</h3>
+        <p>Ultra-lightweight AI agent gateway. ~10 MB image, ~10-20 MB RAM. Minimal footprint.</p>
+        <span class="guide-cmd">--scaffold picoclaw</span>
+      </a>
+      <a href="https://github.com/agentcage/agentcage/blob/master/src/agentcage/scaffolds/nanoclaw/README.md" class="card card-link">
+        <h3>NanoClaw</h3>
+        <p>Agent framework that spawns nested containers. Podman-in-podman with Docker CLI shim.</p>
+        <span class="guide-cmd">--scaffold nanoclaw</span>
+      </a>
     </div>
   </div>
 </section>
@@ -328,7 +349,7 @@
 <section id="quickstart">
   <div class="container">
     <p class="section-label text-center">Quick Start</p>
-    <h2 class="text-center">Up and Running in 4 Steps</h2>
+    <h2 class="text-center">OpenClaw in 4 Steps</h2>
 
     <div class="timeline">
       <div class="timeline-step">
@@ -356,11 +377,11 @@
         <div class="timeline-content">
           <h3>Scaffold a config</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage init myapp --image node:22-slim" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage init myapp --scaffold openclaw" aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage init myapp --image node:22-slim</code>
+            <code>agentcage init myapp --scaffold openclaw</code>
           </div>
         </div>
       </div>
@@ -373,11 +394,13 @@
         <div class="timeline-content">
           <h3>Store secrets</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage secret set myapp ANTHROPIC_API_KEY" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage secret set myapp ANTHROPIC_API_KEY
+agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD" aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage secret set myapp ANTHROPIC_API_KEY</code>
+            <code>agentcage secret set myapp ANTHROPIC_API_KEY
+agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD</code>
           </div>
         </div>
       </div>
