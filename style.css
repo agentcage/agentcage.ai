@@ -709,6 +709,35 @@ section:nth-child(even) {
   margin-top: 0.5rem;
 }
 
+/* ── Built On ──────────────────────────────────────────────────────── */
+.built-on {
+  padding: 3rem 0;
+}
+
+.built-on-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.built-on-logos a {
+  opacity: 0.55;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.built-on-logos a:hover {
+  opacity: 0.9;
+}
+
+[data-theme="light"] .built-on-logos a {
+  filter: invert(1);
+}
+
 /* ── Footer ────────────────────────────────────────────────────────── */
 .footer {
   border-top: 1px solid var(--border);
