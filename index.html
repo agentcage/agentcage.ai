@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>agentcage — Defense-in-depth proxy sandbox for AI agents</title>
+  <meta name="description" content="agentcage generates hardened, sandboxed environments for AI agents. Network isolation, inspecting proxy, secret injection, and fail-closed design.">
+  <meta name="theme-color" content="#0a0b0f">
+  <meta property="og:title" content="agentcage — Defense-in-depth proxy sandbox for AI agents">
+  <meta property="og:description" content="Because 'the agent would never do that' is not a security policy.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agentcage.ai">
+  <meta property="og:image" content="https://agentcage.ai/logo.png">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Blocking theme restore to prevent FOUC
+    (function() {
+      var t = localStorage.getItem('theme');
+      if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────────────────── -->
+<nav class="nav" id="nav">
+  <a href="/" class="nav-brand">
+    <img src="logo.png" alt="agentcage logo" width="28" height="28">
+    agentcage
+  </a>
+  <div class="nav-links">
+    <a href="https://github.com/agentcage/agentcage/tree/master/docs" class="nav-text">Docs</a>
+    <a href="https://github.com/agentcage/agentcage" class="nav-text">GitHub</a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+      <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <img src="logo.png" alt="agentcage" class="hero-logo" width="80" height="80">
+    <h1>agentcage</h1>
+    <p class="hero-tagline">Because "the agent would never do that" is not a security policy.</p>
+    <p class="hero-desc">Defense-in-depth proxy sandbox for AI agents. Your agent runs on an internal-only network with no internet gateway; the only way out is through an inspecting proxy that scans every HTTP request before forwarding it.</p>
+
+    <div class="hero-install">
+      <code>curl -fsSL https://raw.githubusercontent.com/agentcage/agentcage/master/install.sh | sh</code>
+      <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/agentcage/agentcage/master/install.sh | sh" aria-label="Copy install command">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span>Copy</span>
+      </button>
+    </div>
+
+    <div class="hero-buttons">
+      <a href="https://github.com/agentcage/agentcage" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a href="https://github.com/agentcage/agentcage/tree/master/docs" class="btn btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Documentation
+      </a>
+    </div>
+
+    <div class="hero-meta">
+      <span>v0.6.2</span>
+      <span>MIT License</span>
+      <span>Python 3.12+</span>
+      <span>Linux &amp; macOS</span>
+    </div>
+
+    <div class="warning-banner">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Experimental project &mdash; not yet audited by security professionals. Use at your own risk.
+    </div>
+  </div>
+</section>
+
+<!-- ── The Problem ──────────────────────────────────────────────────── -->
+<section id="problem">
+  <div class="container">
+    <p class="section-label text-center">The Problem</p>
+    <h2 class="text-center">The Lethal Trifecta</h2>
+    <p class="section-desc">Most agent deployments hand the agent three things that, combined, create an exfiltration risk most setups have zero defense against.</p>
+
+    <div class="problem-cards">
+      <div class="problem-card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3>Real Secrets</h3>
+        <p>API keys, tokens, and credentials injected directly into the agent's environment.</p>
+      </div>
+      <div class="problem-card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h3>Internet Access</h3>
+        <p>Unrestricted outbound connectivity to any server on the internet.</p>
+      </div>
+      <div class="problem-card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        </div>
+        <h3>Code Execution</h3>
+        <p>Arbitrary code execution with full access to the local filesystem.</p>
+      </div>
+    </div>
+
+    <div class="problem-converge">
+      <strong>agentcage</strong> breaks this combination. The agent never gets real secrets, the only path to the internet is through an inspecting proxy, and container hardening limits execution scope.
+    </div>
+  </div>
+</section>
+
+<!-- ── Defense Layers ───────────────────────────────────────────────── -->
+<section id="features">
+  <div class="container">
+    <p class="section-label text-center">Defense Layers</p>
+    <h2 class="text-center">Multiple Overlapping Defenses</h2>
+    <p class="section-desc">Every HTTP request passes through multiple independent inspection layers. A failure in any one layer doesn't compromise the others.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Network Isolation</h3>
+        <p>Agent on a Podman <code>--internal</code> network with no internet gateway. The only path out is through the inspecting proxy.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Inspecting Proxy</h3>
+        <p>Pluggable inspector chain on every HTTP request, WebSocket frame, and DNS query. 5 built-in inspectors plus custom extensions.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3>Secret Injection</h3>
+        <p>Agent gets placeholders, proxy swaps in real values outbound and redacts inbound. The agent never holds real secrets.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h3>Secret &amp; Payload Scanning</h3>
+        <p>19 regex patterns for common secret formats, Shannon entropy analysis, content-type mismatch detection, and base64 blob scanning.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>DNS Filtering</h3>
+        <p>Allowlist-based dnsmasq sidecar. Non-allowlisted domains resolve to a placeholder IP, keeping SSRF guards functional.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+        </div>
+        <h3>Fail-Closed by Default</h3>
+        <p>If the proxy goes down, the agent gets connection errors — not unfiltered internet. All hardening is on out of the box.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ─────────────────────────────────────────────────── -->
+<section id="architecture">
+  <div class="container">
+    <p class="section-label text-center">How It Works</p>
+    <h2 class="text-center">Three-Container Topology</h2>
+    <p class="section-desc">Agent, DNS sidecar, and inspecting proxy on an internal network with no internet gateway.</p>
+
+    <div class="ascii-diagram">  podman network: &lt;name&gt;-net (--internal, no internet gateway)
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                                                                  │
+  │  ┌──────────────┐    ┌───────────────┐    ┌──────────────────┐  │
+  │  │ Agent         │    │ DNS sidecar   │    │ mitmproxy        │  │
+  │  │ 10.89.0.2    │    │ (dnsmasq)     │    │ + inspector chain│  │
+  │  │               │    │               │    │                  │  │
+  │  │ HTTP_PROXY=  ─┼────┼───────────────┼───►│ forward :8080   ─┼──┼─► Internet
+  │  │  10.89.0.11   │    │               │    │                  │  │
+  │  │               │    │               │    │ transparent:8443│  │
+  │  │ default route─┼────┼───────────────┼───►│  ↕ iptables REDIR│  │
+  │  │               │    │               │    │ reverse :port   ◄┼──┼── Host
+  │  │ resolv.conf  ─┼───►│ resolves via  │    │   ↕ inspects     │  │
+  │  │               │    │ external net ─┼────┼──────────────────┼──┼─► Upstream DNS
+  │  │               │    │               │    │                  │  │
+  │  │ ONLY on       │    │ internal +    │    │ internal +       │  │
+  │  │ internal net  │    │ external net  │    │ external net     │  │
+  │  └──────────────┘    └───────────────┘    └──────────────────┘  │
+  │                                                                  │
+  └──────────────────────────────────────────────────────────────────┘</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Agent Makes Request</h3>
+        <p>The agent sends an HTTP request. It has no internet gateway — traffic can only reach the proxy container.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>DNS Resolution</h3>
+        <p>The dnsmasq sidecar resolves domains against the allowlist. Non-allowlisted domains get a placeholder IP.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Proxy Inspection</h3>
+        <p>mitmproxy runs the inspector chain: domain filtering, secret injection, regex scanning, entropy analysis, and custom inspectors.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>Forward or Block</h3>
+        <p>Clean requests are forwarded to the internet. Suspicious requests get a 403 with a JSON explanation. All decisions are audit-logged.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Isolation Modes ──────────────────────────────────────────────── -->
+<section id="isolation">
+  <div class="container">
+    <p class="section-label text-center">Isolation Modes</p>
+    <h2 class="text-center">Choose Your Isolation Level</h2>
+    <p class="section-desc">Same inspection logic, different isolation boundaries. Container mode for development, Firecracker for production.</p>
+
+    <div class="isolation-grid">
+      <div class="isolation-card">
+        <span class="badge badge-default">Default</span>
+        <h3>Container Mode</h3>
+        <p class="subtitle">Rootless Podman</p>
+        <ul class="spec-list">
+          <li><span class="spec-label">Isolation</span><span class="spec-value">Linux namespaces</span></li>
+          <li><span class="spec-label">Kernel</span><span class="spec-value">Shared with host</span></li>
+          <li><span class="spec-label">Escape risk</span><span class="spec-value">Mitigated, not eliminated</span></li>
+          <li><span class="spec-label">Root required</span><span class="spec-value">No</span></li>
+          <li><span class="spec-label">macOS support</span><span class="spec-value">Yes (Podman machine)</span></li>
+          <li><span class="spec-label">Boot time</span><span class="spec-value">~1s</span></li>
+          <li><span class="spec-label">Best for</span><span class="spec-value">Development, CI, low-risk</span></li>
+        </ul>
+      </div>
+      <div class="isolation-card">
+        <span class="badge badge-kvm">KVM</span>
+        <h3>Firecracker Mode</h3>
+        <p class="subtitle">Hardware Virtualization</p>
+        <ul class="spec-list">
+          <li><span class="spec-label">Isolation</span><span class="spec-value">KVM (VT-x / AMD-V)</span></li>
+          <li><span class="spec-label">Kernel</span><span class="spec-value">Dedicated guest kernel</span></li>
+          <li><span class="spec-label">Escape risk</span><span class="spec-value">Eliminated (VM boundary)</span></li>
+          <li><span class="spec-label">Root required</span><span class="spec-value">Yes</span></li>
+          <li><span class="spec-label">macOS support</span><span class="spec-value">No (/dev/kvm required)</span></li>
+          <li><span class="spec-label">Boot time</span><span class="spec-value">~7s</span></li>
+          <li><span class="spec-label">Best for</span><span class="spec-value">Production, untrusted agents</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Threat Coverage ──────────────────────────────────────────────── -->
+<section id="threats">
+  <div class="container">
+    <p class="section-label text-center">Threat Coverage</p>
+    <h2 class="text-center">What's Defended</h2>
+    <p class="section-desc">Coverage varies by isolation mode. See the <a href="https://github.com/agentcage/agentcage/blob/master/docs/security.md">full threat model</a> for details and known limitations.</p>
+
+    <div class="threat-table-wrapper">
+      <table class="threat-table">
+        <thead>
+          <tr>
+            <th>Threat</th>
+            <th>Container Mode</th>
+            <th>Firecracker Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>HTTP/HTTPS exfiltration</td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+          </tr>
+          <tr>
+            <td>Secret leakage</td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+          </tr>
+          <tr>
+            <td>Unauthorized API calls</td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+          </tr>
+          <tr>
+            <td>DNS exfiltration</td>
+            <td><span class="status-badge status-partial">Partial</span></td>
+            <td><span class="status-badge status-partial">Partial</span></td>
+          </tr>
+          <tr>
+            <td>Container / runtime escape</td>
+            <td><span class="status-badge status-out">Out of scope</span></td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+          </tr>
+          <tr>
+            <td>Kernel exploit</td>
+            <td><span class="status-badge status-out">Out of scope</span></td>
+            <td><span class="status-badge status-defended">Defended</span></td>
+          </tr>
+          <tr>
+            <td>Side-channel attacks</td>
+            <td><span class="status-badge status-out">Out of scope</span></td>
+            <td><span class="status-badge status-out">Out of scope</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Quick Start ──────────────────────────────────────────────────── -->
+<section id="quickstart">
+  <div class="container">
+    <p class="section-label text-center">Quick Start</p>
+    <h2 class="text-center">Up and Running in 4 Steps</h2>
+
+    <div class="timeline">
+      <div class="timeline-step">
+        <div class="timeline-marker">
+          <div class="timeline-dot">1</div>
+          <div class="timeline-line"></div>
+        </div>
+        <div class="timeline-content">
+          <h3>Install</h3>
+          <div class="code-block">
+            <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/agentcage/agentcage/master/install.sh | sh" aria-label="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <code>curl -fsSL https://raw.githubusercontent.com/agentcage/agentcage/master/install.sh | sh</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="timeline-marker">
+          <div class="timeline-dot">2</div>
+          <div class="timeline-line"></div>
+        </div>
+        <div class="timeline-content">
+          <h3>Scaffold a config</h3>
+          <div class="code-block">
+            <button class="copy-btn" data-copy="agentcage init myapp --image node:22-slim" aria-label="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <code>agentcage init myapp --image node:22-slim</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="timeline-marker">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-line"></div>
+        </div>
+        <div class="timeline-content">
+          <h3>Store secrets</h3>
+          <div class="code-block">
+            <button class="copy-btn" data-copy="agentcage secret set myapp ANTHROPIC_API_KEY" aria-label="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <code>agentcage secret set myapp ANTHROPIC_API_KEY</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="timeline-marker">
+          <div class="timeline-dot">4</div>
+        </div>
+        <div class="timeline-content">
+          <h3>Create &amp; verify</h3>
+          <div class="code-block">
+            <button class="copy-btn" data-copy="agentcage cage create -c cage.yaml
+agentcage cage verify myapp" aria-label="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <code>agentcage cage create -c cage.yaml
+agentcage cage verify myapp</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="logo.png" alt="" width="22" height="22">
+          agentcage
+        </div>
+        <p class="footer-tagline">Defense-in-depth proxy sandbox for AI agents.</p>
+        <p class="footer-tagline" style="font-style: italic; font-size: 0.85rem;">Because "the agent would never do that" is not a security policy.</p>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul class="footer-links">
+          <li><a href="https://github.com/agentcage/agentcage">GitHub</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/releases">Releases</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/issues">Issues</a></li>
+          <li><a href="https://pypi.org/project/agentcage/">PyPI</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Documentation</h4>
+        <ul class="footer-links">
+          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/architecture.md">Architecture</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/security.md">Security &amp; Threat Model</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/configuration.md">Configuration</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/cli.md">CLI Reference</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/firecracker.md">Firecracker</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>MIT License</span>
+      <span>Built with nothing but HTML &amp; CSS</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ── Inline JS ────────────────────────────────────────────────────── -->
+<script>
+(function() {
+  // Theme toggle
+  var toggle = document.getElementById('theme-toggle');
+  var moon = document.getElementById('icon-moon');
+  var sun = document.getElementById('icon-sun');
+  function setTheme(t) {
+    if (t === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      moon.style.display = 'none';
+      sun.style.display = 'block';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      moon.style.display = 'block';
+      sun.style.display = 'none';
+    }
+    localStorage.setItem('theme', t);
+  }
+  // Init icons from stored theme
+  var stored = localStorage.getItem('theme');
+  if (stored === 'light') { moon.style.display = 'none'; sun.style.display = 'block'; }
+  toggle.addEventListener('click', function() {
+    var current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'light' ? 'dark' : 'light');
+  });
+
+  // Nav scroll effect
+  var nav = document.getElementById('nav');
+  var scrolled = false;
+  window.addEventListener('scroll', function() {
+    var s = window.scrollY > 20;
+    if (s !== scrolled) { scrolled = s; nav.classList.toggle('scrolled', s); }
+  }, { passive: true });
+
+  // Copy buttons
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    var text = btn.getAttribute('data-copy');
+    if (!text) {
+      var block = btn.closest('.code-block') || btn.closest('.hero-install');
+      if (block) { var code = block.querySelector('code'); if (code) text = code.textContent; }
+    }
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(function() {
+      var span = btn.querySelector('span');
+      if (span) {
+        var orig = span.textContent;
+        span.textContent = 'Copied!';
+        setTimeout(function() { span.textContent = orig; }, 1500);
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
