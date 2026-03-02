@@ -68,11 +68,11 @@
       </a>
     </div>
 
-    <div class="hero-meta">
-      <span>v0.6.2</span>
-      <span>MIT License</span>
-      <span>Python 3.12+</span>
-      <span>Linux &amp; macOS</span>
+    <div class="hero-buttons" style="margin-bottom: 0;">
+      <a href="https://github.com/agentcage/agentcage/blob/master/LICENSE" class="btn btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 22h2a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v3"/><polyline points="14 2 14 8 20 8"/><circle cx="8" cy="16" r="6"/><path d="M9.5 17.5 8 16.25V14"/></svg>
+        MIT License
+      </a>
     </div>
 
     <div class="warning-banner">
@@ -410,16 +410,42 @@ agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD</code>
           <div class="timeline-dot">4</div>
         </div>
         <div class="timeline-content">
-          <h3>Create &amp; verify</h3>
+          <h3>Create the cage</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage cage create -c cage.yaml
-agentcage cage verify myapp" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage cage create -c cage.yaml" aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage cage create -c cage.yaml
-agentcage cage verify myapp</code>
+            <code>agentcage cage create -c cage.yaml</code>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Contributing & Security ──────────────────────────────────────── -->
+<section id="contributing">
+  <div class="container">
+    <div class="card-grid-2">
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
+        </div>
+        <h3>Contributing</h3>
+        <p>Fork the repo, create a feature branch, add tests, and submit a PR. Keep changes focused — one concern per PR.</p>
+        <div style="margin-top: 1rem;">
+          <a href="https://github.com/agentcage/agentcage/blob/master/CONTRIBUTING.md" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Contribution Guide</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Report a Vulnerability</h3>
+        <p>Do not open a public issue for security vulnerabilities. Email <strong>security@agentcage.ai</strong> instead. You will receive an acknowledgment within 48 hours.</p>
+        <div style="margin-top: 1rem;">
+          <a href="https://github.com/agentcage/agentcage/blob/master/SECURITY.md" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Security Policy</a>
         </div>
       </div>
     </div>
