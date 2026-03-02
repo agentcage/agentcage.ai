@@ -734,8 +734,14 @@ section:nth-child(even) {
   opacity: 0.9;
 }
 
+.built-on-logos img {
+  max-height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
 [data-theme="light"] .built-on-logos a {
-  filter: invert(1);
+  filter: brightness(0) saturate(100%);
 }
 
 /* ── Footer ────────────────────────────────────────────────────────── */
