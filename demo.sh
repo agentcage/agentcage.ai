@@ -47,9 +47,9 @@ sleep 0.5
 printf '\n'
 printf '\033[1;36m'
 cat <<'ART'
-           ╔═══════════════════════════════════════════╗
-           ║   agentcage — sandbox your AI agent       ║
-           ╚═══════════════════════════════════════════╝
+           ╔══════════════════════════════════════════════╗
+           ║ agentcage — don't let your agent phone home ║
+           ╚══════════════════════════════════════════════╝
 ART
 printf '\033[0m'
 printf '\033[38;5;243m         Defense-in-depth proxy sandbox for AI agents\033[0m\n'
