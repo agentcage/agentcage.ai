@@ -139,7 +139,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
         <h3>Inspecting Proxy</h3>
-        <p>Pluggable inspector chain on every HTTP request, WebSocket frame, and DNS query. 5 built-in inspectors plus custom extensions.</p>
+        <p>Transparent iptables interception of all outbound HTTP/HTTPS — no per-app proxy config needed. Pluggable inspector chain on every request, WebSocket frame, and DNS query.</p>
       </div>
       <div class="card">
         <div class="card-icon">
@@ -160,7 +160,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
         <h3>DNS Filtering</h3>
-        <p>Allowlist-based dnsmasq sidecar. Non-allowlisted domains resolve to a placeholder IP, keeping SSRF guards functional.</p>
+        <p>dnsmasq sidecar with allowlist and blocklist modes. TLS passthrough for protocols that break under MITM. Non-permitted domains resolve to a placeholder IP.</p>
       </div>
       <div class="card">
         <div class="card-icon">
@@ -199,7 +199,7 @@
       <div class="step">
         <div class="step-number">4</div>
         <h3>Forward or Block</h3>
-        <p>Clean requests are forwarded to the internet. Suspicious requests get a 403 with a JSON explanation. All decisions are audit-logged.</p>
+        <p>Clean requests are forwarded to the internet. Suspicious requests get a 403 with a JSON explanation. All decisions are audit-logged with optional HAR capture for forensic analysis.</p>
       </div>
     </div>
   </div>
@@ -241,24 +241,6 @@
           <li><span class="spec-label">Best for</span><span class="spec-value">Production, untrusted agents</span></li>
         </ul>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── Built On ─────────────────────────────────────────────────────── -->
-<section id="built-on" class="built-on">
-  <div class="container text-center">
-    <p class="section-label">Built On</p>
-    <div class="built-on-logos">
-      <a href="https://mitmproxy.org" title="mitmproxy">
-        <img src="logo-mitmproxy.png" alt="mitmproxy">
-      </a>
-      <a href="https://podman.io" title="Podman">
-        <img src="logo-podman.png" alt="Podman">
-      </a>
-      <a href="https://firecracker-microvm.github.io" title="Firecracker">
-        <img src="logo-firecracker.png" alt="Firecracker">
-      </a>
     </div>
   </div>
 </section>
@@ -346,7 +328,7 @@
     <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
       <a href="https://github.com/agentcage/agentcage/blob/master/src/agentcage/scaffolds/openclaw/README.md" class="card card-link">
         <h3>OpenClaw</h3>
-        <p>Full-featured AI coding agent with browser UI, device pairing, and web search integration.</p>
+        <p>Full-featured AI coding agent with browser UI, device pairing, nested containers, and headless Chrome.</p>
         <span class="guide-cmd">--scaffold openclaw</span>
       </a>
       <a href="https://github.com/agentcage/agentcage/blob/master/src/agentcage/scaffolds/picoclaw/README.md" class="card card-link">
@@ -367,7 +349,7 @@
 <section id="quickstart">
   <div class="container">
     <p class="section-label text-center">Quick Start</p>
-    <h2 class="text-center">OpenClaw in 4 Steps</h2>
+    <h2 class="text-center">OpenClaw in 5 Steps</h2>
 
     <div class="timeline">
       <div class="timeline-step">
@@ -395,11 +377,11 @@
         <div class="timeline-content">
           <h3>Scaffold a config</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage init myapp --scaffold openclaw" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage init myagent --scaffold openclaw" aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage init myapp --scaffold openclaw</code>
+            <code>agentcage init myagent --scaffold openclaw</code>
           </div>
         </div>
       </div>
@@ -412,13 +394,13 @@
         <div class="timeline-content">
           <h3>Store secrets</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage secret set myapp ANTHROPIC_API_KEY
-agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage secret set myagent ANTHROPIC_API_KEY
+agentcage secret set myagent OPENCLAW_GATEWAY_PASSWORD" aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage secret set myapp ANTHROPIC_API_KEY
-agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD</code>
+            <code>agentcage secret set myagent ANTHROPIC_API_KEY
+agentcage secret set myagent OPENCLAW_GATEWAY_PASSWORD</code>
           </div>
         </div>
       </div>
@@ -426,6 +408,7 @@ agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD</code>
       <div class="timeline-step">
         <div class="timeline-marker">
           <div class="timeline-dot">4</div>
+          <div class="timeline-line"></div>
         </div>
         <div class="timeline-content">
           <h3>Create the cage</h3>
@@ -435,6 +418,24 @@ agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD</code>
               <span>Copy</span>
             </button>
             <code>agentcage cage create -c cage.yaml</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="timeline-marker">
+          <div class="timeline-dot">5</div>
+        </div>
+        <div class="timeline-content">
+          <h3>Inspect &amp; interact</h3>
+          <div class="code-block">
+            <button class="copy-btn" data-copy="cage show myagent
+cage shell myagent" aria-label="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <code>cage show myagent
+cage shell myagent</code>
           </div>
         </div>
       </div>
@@ -466,6 +467,18 @@ agentcage secret set myapp OPENCLAW_GATEWAY_PASSWORD</code>
           <a href="https://github.com/agentcage/agentcage/blob/master/SECURITY.md" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Security Policy</a>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Built On ─────────────────────────────────────────────────────── -->
+<section id="built-on" class="built-on">
+  <div class="container text-center">
+    <p class="section-label">Built On</p>
+    <div class="built-on-logos">
+      <a href="https://mitmproxy.org" title="mitmproxy"><img src="logo-mitmproxy.png" alt="mitmproxy"></a>
+      <a href="https://podman.io" title="Podman"><img src="logo-podman.png" alt="Podman"></a>
+      <a href="https://firecracker-microvm.github.io" title="Firecracker"><img src="logo-firecracker.png" alt="Firecracker"></a>
     </div>
   </div>
 </section>
