@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # ── agentcage asciinema demo ─────────────────────────────────────────
 # Usage:
-#   asciinema rec demo.cast -c ./demo.sh --cols 92 --rows 28 --overwrite
+#   ./demo-prep.sh
+#   asciinema rec demo.cast -c ./demo.sh --cols 110 --rows 32 --overwrite
 # ─────────────────────────────────────────────────────────────────────
 set -e
 
@@ -29,15 +30,13 @@ banner() {
 }
 
 note() {
+  echo
   printf '\033[38;5;243m  # %s\033[0m\n' "$1"
   sleep 1
 }
 
-# ── Pre-flight (before recording starts visually) ────────────────────
-REAL_KEY=$(sudo -u openclaw-svc podman secret inspect openclaw01.ANTHROPIC_API_KEY --showsecret \
-  | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['SecretData'])")
-agentcage cage destroy demo --yes >/dev/null 2>&1 || true
-rm -f /tmp/cage.yaml
+# ── Read API key from prep script ─────────────────────────────────────
+REAL_KEY=$(cat /tmp/.demo-key)
 
 # ── Title ────────────────────────────────────────────────────────────
 clear
@@ -46,7 +45,7 @@ printf '\n'
 printf '\033[1;36m'
 cat <<'ART'
            ╔══════════════════════════════════════════════╗
-           ║ agentcage — don't let your agent phone home ║
+           ║ agentcage — don't let your agent phone home  ║
            ╚══════════════════════════════════════════════╝
 ART
 printf '\033[0m'
@@ -88,7 +87,7 @@ run "cat /tmp/cage.yaml"
 banner "2. Store a secret"
 # ═════════════════════════════════════════════════════════════════════
 
-note "Store the real API key — it's encrypted and never reaches the agent"
+note "Store an API key — it's encrypted and never reaches the agent"
 type_cmd "agentcage secret set demo ANTHROPIC_API_KEY"
 printf 'sk-ant-••••••••••••••••\n'
 printf "Secret 'demo.ANTHROPIC_API_KEY' set.\n"
@@ -171,10 +170,6 @@ run "agentcage cage audit demo"
 
 # ── Fin ──────────────────────────────────────────────────────────────
 sleep 1
-printf '\n'
-printf '\033[1;36m  ✓ Locked-down network. No internet gateway.\033[0m\n'
-printf '\033[1;36m  ✓ Agent never held the real API key.\033[0m\n'
-printf '\033[1;36m  ✓ Every request inspected and logged.\033[0m\n'
 printf '\n'
 printf '\033[1m  https://agentcage.ai\033[0m\n'
 printf '\n'
