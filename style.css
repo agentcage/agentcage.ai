@@ -435,7 +435,7 @@ section:nth-child(even) {
 
 .code-block code {
   font-family: inherit;
-  white-space: pre;
+  white-space: pre-line;
 }
 
 .code-block .comment {
