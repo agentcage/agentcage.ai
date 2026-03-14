@@ -107,6 +107,13 @@ h3 { font-size: 1.25rem; font-weight: 600; }
   font-size: 1.05rem;
 }
 
+.demo-player {
+  max-width: 52rem;
+  margin: 0 auto;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
 /* ── Layout ────────────────────────────────────────────────────────── */
 .container {
   max-width: var(--max-w);
