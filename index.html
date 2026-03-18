@@ -218,35 +218,35 @@
   <div class="container">
     <p class="section-label text-center">Isolation Modes</p>
     <h2 class="text-center">Choose Your Isolation Level</h2>
-    <p class="section-desc">Same inspection logic, different isolation boundaries. Container mode for development, Firecracker for production.</p>
+    <p class="section-desc">Same inspection logic, different isolation boundaries. Container mode for fast iteration, VM mode for production.</p>
 
     <div class="isolation-grid">
       <div class="isolation-card">
         <span class="badge badge-default">Default</span>
         <h3>Container Mode</h3>
-        <p class="subtitle">Rootless Podman</p>
+        <p class="subtitle">Rootless Podman &mdash; Linux only</p>
         <ul class="spec-list">
           <li><span class="spec-label">Isolation</span><span class="spec-value">Linux namespaces</span></li>
           <li><span class="spec-label">Kernel</span><span class="spec-value">Shared with host</span></li>
           <li><span class="spec-label">Escape risk</span><span class="spec-value">Mitigated, not eliminated</span></li>
           <li><span class="spec-label">Root required</span><span class="spec-value">No</span></li>
-          <li><span class="spec-label">macOS support</span><span class="spec-value">Yes (Podman machine)</span></li>
+          <li><span class="spec-label">Platforms</span><span class="spec-value">Linux, WSL2</span></li>
           <li><span class="spec-label">Boot time</span><span class="spec-value">~1s</span></li>
           <li><span class="spec-label">Best for</span><span class="spec-value">Development, CI, low-risk</span></li>
         </ul>
       </div>
       <div class="isolation-card">
-        <span class="badge badge-kvm">KVM</span>
-        <h3>Firecracker Mode</h3>
-        <p class="subtitle">Hardware Virtualization</p>
+        <span class="badge badge-kvm">VM</span>
+        <h3>VM Mode</h3>
+        <p class="subtitle">Lima &mdash; Linux &amp; macOS</p>
         <ul class="spec-list">
-          <li><span class="spec-label">Isolation</span><span class="spec-value">KVM (VT-x / AMD-V)</span></li>
+          <li><span class="spec-label">Isolation</span><span class="spec-value">KVM (Linux) / Apple VZ (macOS)</span></li>
           <li><span class="spec-label">Kernel</span><span class="spec-value">Dedicated guest kernel</span></li>
           <li><span class="spec-label">Escape risk</span><span class="spec-value">Eliminated (VM boundary)</span></li>
-          <li><span class="spec-label">Root required</span><span class="spec-value">Yes</span></li>
-          <li><span class="spec-label">macOS support</span><span class="spec-value">No (/dev/kvm required)</span></li>
-          <li><span class="spec-label">Boot time</span><span class="spec-value">~7s</span></li>
-          <li><span class="spec-label">Best for</span><span class="spec-value">Production, untrusted agents</span></li>
+          <li><span class="spec-label">Root required</span><span class="spec-value">No</span></li>
+          <li><span class="spec-label">Platforms</span><span class="spec-value">Linux, macOS (Apple Silicon)</span></li>
+          <li><span class="spec-label">Boot time</span><span class="spec-value">~10s</span></li>
+          <li><span class="spec-label">Best for</span><span class="spec-value">Production, untrusted agents, macOS</span></li>
         </ul>
       </div>
     </div>
@@ -400,13 +400,13 @@
           <div class="timeline-line"></div>
         </div>
         <div class="timeline-content">
-          <h3>Store secrets</h3>
+          <h3>Create the cage with secrets</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage secret set myagent ANTHROPIC_API_KEY && agentcage secret set myagent OPENCLAW_GATEWAY_PASSWORD" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage cage create -c cage.yaml -s ANTHROPIC_API_KEY=sk-ant-..." aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage secret set myagent ANTHROPIC_API_KEY && agentcage secret set myagent OPENCLAW_GATEWAY_PASSWORD</code>
+            <code>agentcage cage create -c cage.yaml -s ANTHROPIC_API_KEY=sk-ant-...</code>
           </div>
         </div>
       </div>
@@ -417,13 +417,13 @@
           <div class="timeline-line"></div>
         </div>
         <div class="timeline-content">
-          <h3>Create the cage</h3>
+          <h3>Verify it's running</h3>
           <div class="code-block">
-            <button class="copy-btn" data-copy="agentcage cage create -c cage.yaml" aria-label="Copy">
+            <button class="copy-btn" data-copy="agentcage cage list && agentcage cage verify myagent" aria-label="Copy">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             </button>
-            <code>agentcage cage create -c cage.yaml</code>
+            <code>agentcage cage list && agentcage cage verify myagent</code>
           </div>
         </div>
       </div>
@@ -482,7 +482,7 @@
     <div class="built-on-logos">
       <a href="https://mitmproxy.org" title="mitmproxy"><img src="logo-mitmproxy.png" alt="mitmproxy"></a>
       <a href="https://podman.io" title="Podman"><img src="logo-podman.png" alt="Podman"></a>
-      <a href="https://firecracker-microvm.github.io" title="Firecracker"><img src="logo-firecracker.png" alt="Firecracker"></a>
+      <a href="https://lima-vm.io" title="Lima"><img src="logo-lima.png" alt="Lima" onerror="this.style.display='none'"></a>
     </div>
   </div>
 </section>
@@ -515,7 +515,7 @@
           <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/security.md">Security &amp; Threat Model</a></li>
           <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/configuration.md">Configuration</a></li>
           <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/cli.md">CLI Reference</a></li>
-          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/firecracker.md">Firecracker</a></li>
+          <li><a href="https://github.com/agentcage/agentcage/blob/master/docs/vm.md">VM Isolation</a></li>
         </ul>
       </div>
     </div>
